@@ -1,4 +1,6 @@
 # Accident Risk Prediction Web App
+<img width="1920" height="1080" alt="Screenshot (8)" src="https://github.com/user-attachments/assets/8b47ac60-75b6-43bf-8556-3cee2ff408c0" />
+
 
 A Django-based web application that predicts accident risk based on various road and environmental factors using a machine learning model.
 
@@ -136,3 +138,4 @@ The machine learning model is trained using data from `ml_model/train.csv`. The 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
