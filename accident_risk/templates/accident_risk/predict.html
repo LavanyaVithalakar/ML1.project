@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accident Risk Prediction</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+      }
+      input[type="text"],
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+      }
+      .checkbox-group input {
+        width: auto;
+        margin-right: 10px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 18px;
+        width: 100%;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .result {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #e8f5e8;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: #2e7d32;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Accident Risk Prediction</h1>
+      <form id="predictionForm">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="road_type">Road Type:</label>
+          <select id="road_type" name="road_type" required>
+            <option value="">Select Road Type</option>
+            <option value="urban">Urban</option>
+            <option value="rural">Rural</option>
+            <option value="highway">Highway</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="num_lanes">Number of Lanes:</label>
+          <input
+            type="number"
+            id="num_lanes"
+            name="num_lanes"
+            min="1"
+            max="8"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="curvature">Curvature:</label>
+          <input
+            type="number"
+            id="curvature"
+            name="curvature"
+            step="0.01"
+            min="0"
+            max="1"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="speed_limit">Speed Limit:</label>
+          <input
+            type="number"
+            id="speed_limit"
+            name="speed_limit"
+            min="25"
+            max="70"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="lighting">Lighting:</label>
+          <select id="lighting" name="lighting" required>
+            <option value="">Select Lighting</option>
+            <option value="daylight">Daylight</option>
+            <option value="dim">Dim</option>
+            <option value="night">Night</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="weather">Weather:</label>
+          <select id="weather" name="weather" required>
+            <option value="">Select Weather</option>
+            <option value="clear">Clear</option>
+            <option value="rainy">Rainy</option>
+            <option value="foggy">Foggy</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-group">
+            <input
+              type="checkbox"
+              id="road_signs_present"
+              name="road_signs_present"
+            />
+            Road Signs Present
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-group">
+            <input type="checkbox" id="public_road" name="public_road" />
+            Public Road
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="time_of_day">Time of Day:</label>
+          <select id="time_of_day" name="time_of_day" required>
+            <option value="">Select Time of Day</option>
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="evening">Evening</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-group">
+            <input type="checkbox" id="holiday" name="holiday" />
+            Holiday
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-group">
+            <input type="checkbox" id="school_season" name="school_season" />
+            School Season
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="num_reported_accidents"
+            >Number of Reported Accidents:</label
+          >
+          <input
+            type="number"
+            id="num_reported_accidents"
+            name="num_reported_accidents"
+            min="0"
+            required
+          />
+        </div>
+        <button type="submit">Predict Accident Risk</button>
+      </form>
+      <div id="result" class="result" style="display: none"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("predictionForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+
+          fetch("", {
+            method: "POST",
+            body: formData,
+            headers: {
+              "X-CSRFToken": document.querySelector(
+                "[name=csrfmiddlewaretoken]",
+              ).value,
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.error) {
+                document.getElementById("result").innerHTML =
+                  `Error: ${data.error}`;
+              } else {
+                document.getElementById("result").innerHTML =
+                  `Predicted Accident Risk: ${data.accident_risk}`;
+              }
+              document.getElementById("result").style.display = "block";
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              document.getElementById("result").innerHTML =
+                "An error occurred. Please try again.";
+              document.getElementById("result").style.display = "block";
+            });
+        });
+    </script>
+  </body>
+</html>
